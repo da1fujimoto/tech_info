@@ -1,0 +1,21 @@
+{% extends "base.html" %} {% block content %}
+<h1>貸し出し状況</h1>
+
+<table class="table table-bordered table-striped table-hover">
+    <thead>
+        <tr><td>No.</td><td>petal length</td><td>petal width</td><td>sepal length</td><td>sepal width</td></tr>
+    </thead>
+    <tbody>
+        {% for data in dbdata %}
+            <tr>
+                <td>{{loop.index}}</td>
+                <td>{{data['petal length']}}</td>
+                <td>{{data['petal width']}}</td>
+                <td>{{data['sepal length']}}</td>
+                <td>{{data['sepal width']}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
