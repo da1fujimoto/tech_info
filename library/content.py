@@ -29,3 +29,7 @@ def app_status():
 @app.route('/about')
 def app_about():
     return render_template('base.html')
+
+@app.route('/camera')
+def qr_code():
+    return render_template('qr_code.html')
