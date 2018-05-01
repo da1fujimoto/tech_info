@@ -6,11 +6,12 @@
     <thead>
         <tr>
             <td>No.</td>
-            <td>petal length</td>
-            <td>petal width</td>
-            <td>sepal length</td>
-            <td>sepal width</td>
-            <td>link</td>
+            <td>貸出状況</td>
+            <td>機器名</td>
+            <td>貸出者</td>
+            <td>貸出日</td>
+            <td>返却予定</td>
+            <td>操作</td>
         </tr>
     </thead>
     <tbody>
@@ -21,6 +22,7 @@
                 <td>{{data['petal width']}}</td>
                 <td>{{data['sepal length']}}</td>
                 <td>{{data['sepal width']}}</td>
+                <td>2018.1.1</td>
                 <td><a href="/" class="btn btn-outline-primary btn-sm">返却</a> <a href="/" class="btn btn-outline-secondary btn-xs">延長</a></td>
             </tr>
         {% endfor %}
