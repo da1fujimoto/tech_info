@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, request, render_template
 from flask import g as Global
 import pymongo
 from pymongo import MongoClient
@@ -7,17 +7,22 @@ app = Flask(__name__)
 
 def db_connection():
     client = MongoClient('10.10.252.62', 27017)
-    db = client.iris_db
-    collection = db.iris_collection
+    db = client.rent_test_db
+    collection = db.rent_test_collection
     return client, collection
 
 # @app.before_request
 # def before_request():
 #     Global.mongo_collection = db_connection()
 
-@app.route('/')
+@app.route('/', methods=['POST', 'GET'])
 def app_route():
-    return render_template('sample_template.html')
+    if request.method == 'GET':
+        return render_template('sample_template.html')
+    elif request.method == 'POST':
+        print(request.method)
+        print(request)
+        return 'ok'
 
 @app.route('/status')
 def app_status():
@@ -33,3 +38,10 @@ def app_about():
 @app.route('/camera')
 def qr_code():
     return render_template('qr_code.html')
+
+@app.route('/test')
+def test_code():
+    return render_template('test.html')
+
+def datetimeformat(value, format='%H:%M / %d-%m-%Y'):
+    return value.strftime(format)
