@@ -8,8 +8,7 @@ app = Flask(__name__)
 def db_connection():
     client = MongoClient('10.10.252.62', 27017)
     db = client.rent_test_db
-    collection = db.rent_test_collection
-    return client, collection
+    return client, db
 
 # @app.before_request
 # def before_request():
@@ -26,10 +25,55 @@ def app_route():
 
 @app.route('/status')
 def app_status():
-    client, collection = db_connection()
-    dbd = collection.find({})
+    client, db = db_connection()
+    r_collection = db.rent_collection
+
+    pipeline = [
+        {
+            '$lookup':
+            {
+                'from': 'equip_collection',
+                'localField': 'equip_id',
+                'foreignField': 'equip_id',
+                'as': 'equipInfos'
+            }
+        },
+        {'$unwind': '$equipInfos'},
+        {
+            '$lookup':
+            {
+                'from': 'user_collection',
+                'localField': 'user_id',
+                'foreignField': 'user_id',
+                'as': 'userInfos'
+            }
+        },
+        {'$unwind': '$userInfos'},
+        {
+            '$project':
+            {
+                'id': '$id',
+                'state': '$state',
+                'equip_id': '$equip_id',
+                'equip_name': '$equipInfos.name',
+                'user_id': '$user_id',
+                'user_email': '$userInfos.email',
+                'rent_date': '$rent_date',
+                'return_p_date': '$return_p_date',
+                'return_date': '$return_date',
+                'time_stamp': '$time_stamp',
+        }},
+        {'$sort': {'time_stamp': 1}},
+    ]
+
+    data_dict = {}
+    for data in r_collection.aggregate(pipeline):
+        data_dict[data['equip_id']] = data
+
     client.close()
-    return render_template('status_table.html', dbdata=list(dbd))
+
+    dblist = list(data_dict.values())
+    return render_template('status_table.html', dbdata=dblist)
 
 @app.route('/about')
 def app_about():
