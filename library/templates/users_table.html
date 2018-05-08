@@ -1,0 +1,32 @@
+{% extends "base2.html" %} {% block content %}
+
+<h1>ユーザー一覧</h1>
+
+<style>
+    .table-hover thead tr:hover th,
+    .table-hover tbody tr:hover td {
+        background-color: rgb(255, 239, 243);
+    }
+</style>
+
+<table id="table_id" class="table table-striped table-hover table-sm" style="width:100%">
+    <thead>
+        <tr>
+            <td>No.</td>
+            <td>メールアドレス</td>
+            <td>備考</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in dbdata %}
+        <tr>
+            <!-- <td>{{loop.index}}</td> -->
+            <td>{{data['user_id']}}</td>
+            <td><a href="/users/{{data['user_id']}}">{{data['email']}}</a></td>
+            <td>{{data['extra']}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

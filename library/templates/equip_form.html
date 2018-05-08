@@ -1,0 +1,19 @@
+{% extends "base2.html" %} {% block content %}
+
+<h1>{{dbdata['name']}}</h1>
+
+<div class="row" style="margin-top:20px">
+    <div class="col-md-12">
+        <form role="form" action="/equip" method="POST">
+            <div class="form-group">
+                <label for="extra">備考</label>
+                <textarea class="form-control" name="extra" rows="4">{{dbdata['extra']}}</textarea>
+            </div>
+            <input type="hidden" name="name" value="{{dbdata['name']}}">
+            <input type="hidden" name="equip_id" value="{{dbdata['equip_id']}}">
+            <button type="submit" name='submit' class="btn btn-default" value="Form sent!">保存</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

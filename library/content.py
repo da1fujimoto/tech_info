@@ -1,7 +1,8 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect
 from flask import g as Global
 import pymongo
 from pymongo import MongoClient
+import datetime
 
 app = Flask(__name__)
 
@@ -82,6 +83,102 @@ def app_about():
 @app.route('/camera')
 def qr_code():
     return render_template('qr_code.html')
+
+@app.route('/equip', methods=['POST', 'GET'])
+def equip_table():
+    if request.method == 'GET':
+        client, db = db_connection()
+        e_collection = db.equip_collection
+
+        pipeline = [{'$sort': {'time_stamp': 1}}]
+
+        data_dict = {}
+        for data in e_collection.aggregate(pipeline):
+            data_dict[data['equip_id']] = data
+
+        client.close()
+
+        dblist = list(data_dict.values())
+        return render_template('equip_table.html', dbdata=dblist)
+    else:
+        equip_id = request.form['equip_id']
+        name = request.form['name']
+        extra = extra=request.form['extra']
+
+        client, db = db_connection()
+        e_collection = db.equip_collection
+
+        input_dict = {'equip_id': equip_id, 'name': name, 'extra': extra, 'time_stamp': datetime.datetime.now()}
+
+        e_collection.insert_one(input_dict)
+        client.close()
+
+        return redirect('/equip')
+
+@app.route('/equip/<equip_id>')
+def equip_edit(equip_id):
+    client, db = db_connection()
+    e_collection = db.equip_collection
+
+    pipeline = [{'$sort': {'time_stamp': 1}}]
+
+    data_dict = {}
+    for data in e_collection.aggregate(pipeline):
+        if equip_id == data['equip_id']:
+            data_dict[data['equip_id']] = data
+
+    client.close()
+
+    dbdata = data_dict[equip_id]
+    return render_template('equip_form.html', dbdata=dbdata)
+
+@app.route('/users', methods=['POST', 'GET'])
+def users_table():
+    if request.method == 'GET':
+        client, db = db_connection()
+        u_collection = db.user_collection
+
+        pipeline = [{'$sort': {'time_stamp': 1}}]
+
+        data_dict = {}
+        for data in u_collection.aggregate(pipeline):
+            data_dict[data['user_id']] = data
+
+        client.close()
+
+        dblist = list(data_dict.values())
+        return render_template('users_table.html', dbdata=dblist)
+    else:
+        user_id = request.form['user_id']
+        email = request.form['email']
+        extra = extra=request.form['extra']
+
+        client, db = db_connection()
+        u_collection = db.user_collection
+
+        input_dict = {'user_id': user_id, 'email': email, 'extra': extra, 'time_stamp': datetime.datetime.now()}
+
+        u_collection.insert_one(input_dict)
+        client.close()
+
+        return redirect('/users')
+
+@app.route('/users/<user_id>')
+def user_edit(user_id):
+    client, db = db_connection()
+    u_collection = db.user_collection
+
+    pipeline = [{'$sort': {'time_stamp': 1}}]
+
+    data_dict = {}
+    for data in u_collection.aggregate(pipeline):
+        if user_id == data['user_id']:
+            data_dict[data['user_id']] = data
+
+    client.close()
+
+    dbdata = data_dict[user_id]
+    return render_template('users_form.html', dbdata=dbdata)
 
 @app.route('/test')
 def test_code():

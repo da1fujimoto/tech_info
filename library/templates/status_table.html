@@ -29,8 +29,8 @@
             <td>{{data['equip_id']}}</td>
             {% if data['state'] == 0 %}
             <td class="active">返却済</td>
-            <td>{{data['equip_name']}}</td>
-            <td>{{data['user_email']}}</td>
+            <td><a href="/equip/{{data['equip_id']}}">{{data['equip_name']}}</a></td>
+            <td><a href="/users/{{data['user_id']}}">{{data['user_email']}}</a></td>
             <td>-</td>
             <td>-</td>
             <td>{{data['return_date']}}</td>
@@ -40,8 +40,8 @@
             </td>
             {% else %}
             <td>貸出中</td>
-            <td>{{data['equip_name']}}</td>
-            <td>{{data['user_email']}}</td>
+            <td><a href="/equip/{{data['equip_id']}}">{{data['equip_name']}}</a></td>
+            <td><a href="/users/{{data['user_id']}}">{{data['user_email']}}</a></td>
             <td>{{data['rent_date']}}</td>
             <td>{{data['return_p_date']}}</td>
             <td>-</td>
