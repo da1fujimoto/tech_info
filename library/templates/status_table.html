@@ -9,7 +9,7 @@
     }
 </style>
 
-<table id="table_id" class="table table-striped table-hover table-sm" style="width:100%">
+<table id="table_id" class="table table-hover table-sm" style="width:100%">
     <thead>
         <tr>
             <td>No.</td>
@@ -24,33 +24,66 @@
     </thead>
     <tbody>
         {% for data in dbdata %}
-        <tr>
-            <!-- <td>{{loop.index}}</td> -->
-            <td>{{data['equip_id']}}</td>
             {% if data['state'] == 0 %}
-            <td class="active">返却済</td>
-            <td><a href="/equip/{{data['equip_id']}}">{{data['equip_name']}}</a></td>
-            <td><a href="/users/{{data['user_id']}}">{{data['user_email']}}</a></td>
-            <td>-</td>
-            <td>-</td>
-            <td>{{data['return_date']}}</td>
-            <td>
-                <a href="" class="btn btn-default btn-sm disabled">返却</a>
-                <a href="" class="btn btn-primary btn-sm disabled">延長</a>
-            </td>
+                <tr class="active">
+                    <td>{{loop.index}}</td>
+                    <!-- <td>{{data['equip_id']}}</td> -->
+                    <td>
+                        <p class="text-success">返却済</p>
+                    </td>
+                    <td>
+                        <a href="/equip/{{data['equip_id']}}">{{data['equip_name']}}</a>
+                    </td>
+                    <td>
+                        <a href="/users/{{data['user_id']}}">{{data['user_email']}}</a>
+                    </td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>{{data['return_date']}}</td>
+                    <td>
+                        <a href="" class="btn btn-default btn-sm disabled">返却</a>
+                        <a href="" class="btn btn-primary btn-sm disabled">延長</a>
+                    </td>
+                </tr>
             {% else %}
-            <td>貸出中</td>
-            <td><a href="/equip/{{data['equip_id']}}">{{data['equip_name']}}</a></td>
-            <td><a href="/users/{{data['user_id']}}">{{data['user_email']}}</a></td>
-            <td>{{data['rent_date']}}</td>
-            <td>{{data['return_p_date']}}</td>
-            <td>-</td>
-            <td>
-                <a href="/" class="btn btn-default btn-sm">返却</a>
-                <a href="/" class="btn btn-primary btn-sm">延長</a>
-            </td>
+                {% if data['over'] == 1 %}
+                    <tr class="warning">
+                        <td>{{loop.index}}</td>
+                        <!-- <td>{{data['equip_id']}}</td> -->
+                        <td><p class="text-danger">貸出中(延滞)</p></td>
+                {% else %}
+                    <tr>
+                        <td>{{loop.index}}</td>
+                        <!-- <td>{{data['equip_id']}}</td> -->
+                        <td>貸出中</td>
+                {% endif %}
+                    <td>
+                        <a href="/equip/{{data['equip_id']}}">{{data['equip_name']}}</a>
+                    </td>
+                    <td>
+                        <a href="/users/{{data['user_id']}}">{{data['user_email']}}</a>
+                    </td>
+                    <td>{{data['rent_date']}}</td>
+                    <td>{{data['return_p_date']}}</td>
+                    <td>-</td>
+                    <td><div style="display:inline-flex">
+                        <form role="form" action="/update" method="POST">
+                            <input type="hidden" name="equip_name" value="{{data['equip_name']}}">
+                            <input type="hidden" name="equip_id" value="{{data['equip_id']}}">
+                            <input type="hidden" name="user_email" value="{{data['user_email']}}">
+                            <input type="hidden" name="user_id" value="{{data['user_id']}}">
+                            <input class="btn btn-default btn-sm" type='submit' name='action' value="返却">
+                        </form>&nbsp;
+                        <form role="form" action="/update" method="POST">
+                            <input type="hidden" name="equip_name" value="{{data['equip_name']}}">
+                            <input type="hidden" name="equip_id" value="{{data['equip_id']}}">
+                            <input type="hidden" name="user_email" value="{{data['user_email']}}">
+                            <input type="hidden" name="user_id" value="{{data['user_id']}}">
+                            <input class="btn btn-primary btn-sm" type='submit' name='action' value='延長'>
+                        </form></div>
+                    </td>
+                </tr>
             {% endif %}
-        </tr>
         {% endfor %}
     </tbody>
 </table>

@@ -102,7 +102,7 @@
               <a href="/users">Users</a>
             </li>
             <li>
-              <a href="/test">Test</a>
+              <a href="/admin">Admin</a>
             </li>
           </ul>
         </div>
@@ -111,22 +111,11 @@
   </header>
 
   <div class="container">
-
-    <!-- <div class="page-header" id="banner">
-      <div class="row">
-        <div class="col-lg-8 col-md-7 col-sm-6">
-          <h1>Rin</h1>
-          <p class="lead">Rin is one of the original Bootstrap theme.</p>
-        </div>
-      </div>
-    </div> -->
-
     <!-- Main Content -->
     <div class="page-conent" id="main-content">
       {% block content %} this is templates block {% endblock %}
     </div>
   </div>
-
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="{{ url_for('static', filename='vendor/rin/js/bootstrap.min.js') }}"></script>
@@ -138,8 +127,11 @@
         "pageLength": 10,
         "language": {
           url: "https://cdn.datatables.net/plug-ins/1.10.16/i18n/Japanese.json"
-        }
+        },
       });
+    });
+    $(document).ready(function () {
+      $('table.display').DataTable();
     });
   </script>
   <script type="text/javascript">

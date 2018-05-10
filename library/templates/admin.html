@@ -1,0 +1,108 @@
+{% extends "base2.html" %} {% block content %}
+
+
+<style>
+    .table-hover thead tr:hover th,
+    .table-hover tbody tr:hover td {
+        background-color: rgb(255, 239, 243);
+    }
+</style>
+
+<hr>
+
+<h2>状態一覧</h2>
+<div class="row">
+    <table id="" class="display table-striped table-hover table-sm" style="width:100%">
+        <thead>
+            <tr>
+                <td>No.</td>
+                <td>貸出状況</td>
+                <td>機器id</td>
+                <td>貸出者id</td>
+                <td>貸出日</td>
+                <td>返却予定</td>
+                <td>返却日</td>
+                <td>timestamp</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in r_dbdata %}
+            <tr>
+                <td>{{loop.index}}</td>
+                <td>{{data['state']}}</td>
+                <td>
+                    <a href="/equip/{{data['equip_id']}}">{{data['equip_id']}}</a>
+                </td>
+                <td>
+                    <a href="/users/{{data['user_id']}}">{{data['user_id']}}</a>
+                </td>
+                <td>{{data['rent_date']}}</td>
+                <td>{{data['return_p_date']}}</td>
+                <td>{{data['return_date']}}</td>
+                <td>{{data['time_stamp']}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<hr>
+
+<h2>ユーザー一覧</h2>
+<div class="row">
+    <table id="" class="display table-striped table-hover table-sm" style="width:100%">
+        <thead>
+            <tr>
+                <td>No.</td>
+                <td>ユーザーid</td>
+                <td>email</td>
+                <td>備考</td>
+                <td>timestamp</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in u_dbdata %}
+            <tr>
+                <td>{{loop.index}}</td>
+                <td>
+                    <a href="/users/{{data['user_id']}}">{{data['user_id']}}</a>
+                </td>
+                <td>{{data['email']}}</td>
+                <td>{{data['extra']}}</td>
+                <td>{{data['time_stamp']}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<hr>
+
+<h2>機器一覧</h2>
+<div class="row">
+    <table id="" class="display table-striped table-hover table-sm" style="width:100%">
+        <thead>
+            <tr>
+                <td>No.</td>
+                <td>機器id</td>
+                <td>機器名</td>
+                <td>備考</td>
+                <td>timestamp</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in e_dbdata %}
+            <tr>
+                <td>{{loop.index}}</td>
+                <td>
+                    <a href="/equip/{{data['equip_id']}}">{{data['equip_id']}}</a>
+                </td>
+                <td>{{data['name']}}</td>
+                <td>{{data['extra']}}</td>
+                <td>{{data['time_stamp']}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
