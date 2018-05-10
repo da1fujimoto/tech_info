@@ -4,7 +4,7 @@ import ssl
 from library.content import app
 
 if __name__ == '__main__':
-    ssl_enable = False
+    ssl_enable = True
     app.debug = True
     host = os.environ.get('IP', '0.0.0.0')
     port = int(os.environ.get('PORT', 18000))

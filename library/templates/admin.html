@@ -105,4 +105,14 @@
         </tbody>
     </table>
 </div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var my_element = document.getElementById("navbar-admin");
+        console.log(my_element)
+        my_element.classList.add("active");
+    });
+</script>
+
 {% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base2.html" %} {% block content %}
+
+<h1>手動返却</h1>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="bs-component">
+            <div class="alert alert-dismissible alert-success">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <p>手動での返却フォームです。リストにない場合は管理者に追加を依頼してください。</p>
+            </div>
+        </div>
+        <form role="form" action="/update" method="POST">
+            <div class="form-group">
+                <input type="hidden" name="action" value="返却">
+                <label for="select" class="col-lg-2 control-label">機器名</label>
+                <div class="col-lg-10">
+                    <select class="form-control" name="equip_name">
+                        {% for equip in equip_list %}
+                        <option>{{equip['equip_name']}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="modal" id="modal-update" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <h4 class="modal-title" id="modal-label">確認</h4>
+                            </div>
+                            <div class="modal-body">
+                                返却処理しても良いですか？
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cansel</button>
+                                <button type="submit" name='submit' class="btn btn-primary" value="Form sent!">返却</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <br>
+        <br>
+        <button class="btn btn-primary pull-right" data-toggle="modal" data-target="#modal-update">返却</button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var my_element = document.getElementById("navbar-manual");
+        console.log(my_element)
+        my_element.classList.add("active");
+    });
+</script>
+
+{% endblock %}

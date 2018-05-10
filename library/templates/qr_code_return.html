@@ -1,5 +1,5 @@
 {% extends "base2.html" %} {% block content %}
-<h1>QRCODE貸出</h1>
+<h1>QRCODE返却</h1>
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/instascan.min.js') }}"></script>
 
@@ -7,7 +7,6 @@
   <div class="col-md-12">
     <div class="form-group">
       <input id="input_equip_name" name="equip_name" value="">
-      <input id="input_user_email" name="user_email" value="">
     </div>
   </div>
 </div>
@@ -19,7 +18,6 @@
   scanner.addListener('scan', function (content) {
 
     var ename_element = document.getElementById("input_equip_name");
-    var umail_element = document.getElementById("input_user_email");
 
     var r_result = content.indexOf("device=");
     if(r_result !== -1) {
@@ -27,15 +25,9 @@
       ename_element.value = r_device[1];
     }
 
-    r_result = content.indexOf("user=");
-    if(r_result !== -1) {
-      var r_device = content.split("user=");
-      umail_element.value = r_device[1];
-    }
-
-    if(umail_element.value != "" && ename_element.value != "") {
-      alert("両方に値入ったぜ");
-      sampleForm(ename_element.value, umail_element.value);
+    if(ename_element.value != "") {
+      alert("返却");
+      sampleForm(ename_element.value);
     }
   });
   Instascan.Camera.getCameras().then(function (cameras) {
@@ -59,14 +51,8 @@
 
     var input_u = document.createElement("input");
     input_u.setAttribute("type", "hidden");
-    input_u.setAttribute("name", "user_email");
-    input_u.setAttribute("value", uvalue);
-    form.appendChild(input_u);
-
-    var input_u = document.createElement("input");
-    input_u.setAttribute("type", "hidden");
     input_u.setAttribute("name", "action");
-    input_u.setAttribute("value", "貸出");
+    input_u.setAttribute("value", "返却");
     form.appendChild(input_u);
 
     form.setAttribute("action", "/update");

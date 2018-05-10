@@ -22,7 +22,7 @@ def app_route():
     elif request.method == 'POST':
         print(request.method)
         print(request)
-        return str(request)
+        return str(request.form)
 
 @app.route('/status')
 def app_status():
@@ -90,10 +90,6 @@ def app_status():
 
     dblist = list(data_dict.values())
     return render_template('status_table.html', dbdata=dblist)
-
-@app.route('/camera')
-def qr_code():
-    return render_template('qr_code.html')
 
 @app.route('/equip', methods=['POST', 'GET'])
 def equip_table():
@@ -224,16 +220,17 @@ def update_seq():
         u_collection = db.user_collection
         e_collection = db.equip_collection
 
-        if 'equip_name' not in request.form.keys() or 'user_email' not in request.form.keys():
+        # 機器名が渡されてない場合はそもそもエラー
+        if 'equip_name' not in request.form.keys():
             print('not set name error')
             return redirect('/status')
+        else:
+            equip_name = request.form['equip_name']
 
-        equip_name = request.form['equip_name']
-        user_email = request.form['user_email']
-
+        # 機器IDが空欄の場合、DBを探してなければ登録。あればDBからIDを引いてくる
         if 'equip_id' not in request.form.keys():
             equipdata = e_collection.find_one({'name': request.form['equip_name']}, sort=[('time_stamp', -1)])
-            if equpdata != None:
+            if equipdata != None:
                 equip_id = equipdata['equip_id']
             else:
                 equipdata = e_collection.find_one(sort=[('equip_id', -1)])
@@ -241,35 +238,53 @@ def update_seq():
                 input_dict = {'equip_id': int(equip_id), 'name': equip_name, 'extra': '', 'time_stamp': datetime.datetime.now()}
                 e_collection.insert_one(input_dict)
         else:
-            equip_id = request.form['equip_id']
+            equip_id = int(request.form['equip_id'])
 
-        if 'user_id' not in request.form.keys():
-            userdata = u_collection.find_one({'email': request.form['user_email']}, sort=[('time_stamp', -1)])
-            if userdata != None:
-                user_id = userdata['user_id']
+        # メールアドレスが空欄の場合、DBから最後のユーザー名を取得
+        if 'user_email' not in request.form.keys():
+            edata = e_collection.find_one({'name': equip_name}, sort=[('time_stamp', -1)])
+            rdata = r_collection.find_one({'equip_id': edata['equip_id']}, sort=[('time_stamp', -1)])
+            if rdata == None:
+                user_email = ''
             else:
-                userdata = e_collection.find_one(sort=[('user_id', -1)])
-                user_id = userdata['user_id'] + 1
-                input_dict = {'user_id': int(user_id), 'email': user_email, 'extra': '', 'time_stamp': datetime.datetime.now()}
-                u_collection.insert_one(input_dict)
+                udata = u_collection.find_one({'user_id': rdata['user_id']}, sort=[('time_stamp', -1)])
+                user_email = udata['email']
         else:
-            user_id = request.form['user_id']
+            user_email = request.form['user_email']
 
+        # ユーザーIDが空欄の場合、DBを探してなければ登録。あればDBからIDを引いてくる
+        if user_email == '':
+            user_id = None
+        else:
+            if 'user_id' not in request.form.keys():
+                userdata = u_collection.find_one({'email': user_email}, sort=[('time_stamp', -1)])
+                if userdata != None:
+                    user_id = userdata['user_id']
+                else:
+                    userdata = u_collection.find_one(sort=[('user_id', -1)])
+                    user_id = userdata['user_id'] + 1
+                    input_dict = {'user_id': int(user_id), 'email': user_email, 'extra': '', 'time_stamp': datetime.datetime.now()}
+                    u_collection.insert_one(input_dict)
+            else:
+                user_id = int(request.form['user_id'])
+
+        # 返却処理の場合
         if 'action' in request.form.keys() and request.form['action'] == '返却':
             input_dict = {
                 'state': 0,
-                'equip_id': int(equip_id),
-                'user_id': int(user_id),
+                'equip_id': equip_id,
+                'user_id': user_id,
                 'rent_date': None,
                 'return_p_date': None,
                 'return_date': datetime.datetime.now(),
                 'time_stamp': datetime.datetime.now()
             }
+        # 貸出、延長の場合
         else:
             input_dict = {
                 'state': 1,
-                'equip_id': int(equip_id),
-                'user_id': int(user_id),
+                'equip_id': equip_id,
+                'user_id': user_id,
                 'rent_date': datetime.datetime.now(),
                 'return_p_date': datetime.datetime.now() + datetime.timedelta(days=7),
                 'return_date': None,
@@ -281,16 +296,50 @@ def update_seq():
 
         return redirect('/status')
 
-@app.route('/postest', methods=['POST', 'GET'])
-def postest():
-    print(request.method)
-    return redirect('/')
+@app.route('/manual')
+def manual_rent():
+    return redirect('/manual/rent')
 
-@app.route('/toPostURL', methods=['POST'])
-def get_user_info():
-    username =  request.form['username'];
-    age = request.form['age'];
-    print(username, age, request.method)
-    response = Response()
-    response.status_code = 200
-    return response
+@app.route('/manual/<rent>')
+def manual(rent):
+    client, db = db_connection()
+    e_collection = db.equip_collection
+    u_collection = db.user_collection
+
+    equips = e_collection.find(sort=[('time_stamp', 1)])
+
+    data_dict = {}
+    for data in equips:
+        data_dict[data['equip_id']] = data
+        
+    equip_list = []
+    for val in data_dict.values():
+        equip_list.append({'equip_id': val['equip_id'],'equip_name': val['name']})
+
+    users = u_collection.find(sort=[('time_stamp', 1)])
+
+    data_dict = {}
+    for data in users:
+        data_dict[data['user_id']] = data
+
+    user_list = []
+    for val in data_dict.values():
+        user_list.append({'user_id': val['user_id'],'user_email': val['email']})
+
+    client.close()
+
+    if rent == 'rent':
+        return render_template('manual_rent_form.html', equip_list=equip_list, user_list=user_list)
+    else:
+        return render_template('manual_return_form.html', equip_list=equip_list, user_list=user_list)
+
+@app.route('/camera')
+def qr_code_rent():
+    return render_template('qr_code_rent.html')
+
+@app.route('/camera/<rent>')
+def qr_code(rent):
+    if rent == 'rent':
+        return render_template('qr_code_rent.html')
+    else:
+        return render_template('qr_code_return.html')
